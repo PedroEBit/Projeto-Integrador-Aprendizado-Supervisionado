@@ -28,6 +28,28 @@ class FileHandler:
         
         self.cipher = Fernet(self.encryption_key)
     
+    def _validate_path(self, filepath: str) -> str:
+        """
+        Valida e normaliza um caminho de arquivo para prevenir path traversal
+        
+        Args:
+            filepath: Caminho a ser validado
+            
+        Returns:
+            Caminho normalizado e validado
+            
+        Raises:
+            ValueError: Se o caminho contém caracteres suspeitos
+        """
+        # Normaliza o caminho
+        normalized_path = os.path.abspath(filepath)
+        
+        # Verifica se o caminho não contém padrões suspeitos
+        if '..' in filepath or filepath.startswith('/etc') or filepath.startswith('/sys'):
+            raise ValueError("Invalid file path")
+        
+        return normalized_path
+    
     def save_encryption_key(self, filepath: str) -> None:
         """
         Salva a chave de criptografia em um arquivo
@@ -58,8 +80,8 @@ class FileHandler:
             output_path: Caminho do arquivo comprimido de saída
         """
         # Validate paths to prevent path traversal attacks
-        input_path = os.path.abspath(input_path)
-        output_path = os.path.abspath(output_path)
+        input_path = self._validate_path(input_path)
+        output_path = self._validate_path(output_path)
         
         with open(input_path, 'rb') as f_in:
             with gzip.open(output_path, 'wb') as f_out:
@@ -74,8 +96,8 @@ class FileHandler:
             output_path: Caminho do arquivo descomprimido de saída
         """
         # Validate paths to prevent path traversal attacks
-        input_path = os.path.abspath(input_path)
-        output_path = os.path.abspath(output_path)
+        input_path = self._validate_path(input_path)
+        output_path = self._validate_path(output_path)
         
         with gzip.open(input_path, 'rb') as f_in:
             with open(output_path, 'wb') as f_out:
@@ -90,8 +112,8 @@ class FileHandler:
             output_path: Caminho do arquivo criptografado de saída
         """
         # Validate paths to prevent path traversal attacks
-        input_path = os.path.abspath(input_path)
-        output_path = os.path.abspath(output_path)
+        input_path = self._validate_path(input_path)
+        output_path = self._validate_path(output_path)
         
         with open(input_path, 'rb') as f_in:
             data = f_in.read()
@@ -109,8 +131,8 @@ class FileHandler:
             output_path: Caminho do arquivo descriptografado de saída
         """
         # Validate paths to prevent path traversal attacks
-        input_path = os.path.abspath(input_path)
-        output_path = os.path.abspath(output_path)
+        input_path = self._validate_path(input_path)
+        output_path = self._validate_path(output_path)
         
         with open(input_path, 'rb') as f_in:
             encrypted_data = f_in.read()

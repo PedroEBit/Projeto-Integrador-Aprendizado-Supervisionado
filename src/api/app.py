@@ -101,7 +101,9 @@ def upload_file():
         }), 200
     
     except Exception as e:
-        return jsonify({"error": f"Erro ao processar arquivo: {str(e)}"}), 500
+        # Log the error for debugging but don't expose stack trace to users
+        app.logger.error(f"Error processing file: {str(e)}")
+        return jsonify({"error": "Erro ao processar arquivo"}), 500
 
 
 @app.route('/train', methods=['POST'])
@@ -155,7 +157,9 @@ def train_model():
         }), 200
     
     except Exception as e:
-        return jsonify({"error": f"Erro ao treinar modelo: {str(e)}"}), 500
+        # Log the error for debugging but don't expose stack trace to users
+        app.logger.error(f"Error training model: {str(e)}")
+        return jsonify({"error": "Erro ao treinar modelo"}), 500
 
 
 @app.route('/predict', methods=['POST'])
@@ -200,7 +204,9 @@ def predict():
         }), 200
     
     except Exception as e:
-        return jsonify({"error": f"Erro ao realizar predições: {str(e)}"}), 500
+        # Log the error for debugging but don't expose stack trace to users
+        app.logger.error(f"Error making predictions: {str(e)}")
+        return jsonify({"error": "Erro ao realizar predições"}), 500
 
 
 @app.route('/model/info', methods=['GET'])
@@ -220,7 +226,9 @@ def model_info():
         return jsonify(info), 200
     
     except Exception as e:
-        return jsonify({"error": f"Erro ao obter informações: {str(e)}"}), 500
+        # Log the error for debugging but don't expose stack trace to users
+        app.logger.error(f"Error getting model info: {str(e)}")
+        return jsonify({"error": "Erro ao obter informações"}), 500
 
 
 @app.route('/model/reset', methods=['POST'])
@@ -244,7 +252,9 @@ def reset_model():
             }), 200
     
     except Exception as e:
-        return jsonify({"error": f"Erro ao resetar modelo: {str(e)}"}), 500
+        # Log the error for debugging but don't expose stack trace to users
+        app.logger.error(f"Error resetting model: {str(e)}")
+        return jsonify({"error": "Erro ao resetar modelo"}), 500
 
 
 @app.route('/key/export', methods=['GET'])
@@ -265,8 +275,12 @@ def export_key():
         }), 200
     
     except Exception as e:
-        return jsonify({"error": f"Erro ao exportar chave: {str(e)}"}), 500
+        # Log the error for debugging but don't expose stack trace to users
+        app.logger.error(f"Error exporting key: {str(e)}")
+        return jsonify({"error": "Erro ao exportar chave"}), 500
 
 
 if __name__ == '__main__':
-    app.run(debug=True, host='0.0.0.0', port=5000)
+    # Use environment variable for debug mode, default to False for security
+    debug_mode = os.getenv('DEBUG_MODE', 'False').lower() == 'true'
+    app.run(debug=debug_mode, host='0.0.0.0', port=5000)

@@ -57,6 +57,10 @@ class FileHandler:
             input_path: Caminho do arquivo de entrada
             output_path: Caminho do arquivo comprimido de saída
         """
+        # Validate paths to prevent path traversal attacks
+        input_path = os.path.abspath(input_path)
+        output_path = os.path.abspath(output_path)
+        
         with open(input_path, 'rb') as f_in:
             with gzip.open(output_path, 'wb') as f_out:
                 f_out.writelines(f_in)
